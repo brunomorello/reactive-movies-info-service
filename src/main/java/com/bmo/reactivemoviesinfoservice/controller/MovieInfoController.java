@@ -2,6 +2,7 @@ package com.bmo.reactivemoviesinfoservice.controller;
 
 import com.bmo.reactivemoviesinfoservice.domain.MovieInfo;
 import com.bmo.reactivemoviesinfoservice.service.MovieInfoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,7 @@ public class MovieInfoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<MovieInfo> create(@RequestBody MovieInfo movieInfo) {
+    public Mono<MovieInfo> create(@RequestBody @Valid MovieInfo movieInfo) {
         return service.createMovieInfo(movieInfo);
     }
 

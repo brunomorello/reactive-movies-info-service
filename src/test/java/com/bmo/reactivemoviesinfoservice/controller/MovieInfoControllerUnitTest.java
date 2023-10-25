@@ -1,5 +1,6 @@
 package com.bmo.reactivemoviesinfoservice.controller;
 
+import com.bmo.reactivemoviesinfoservice.domain.ErrorResponse;
 import com.bmo.reactivemoviesinfoservice.domain.MovieInfo;
 import com.bmo.reactivemoviesinfoservice.service.MovieInfoService;
 import org.junit.jupiter.api.Test;
@@ -122,6 +123,28 @@ public class MovieInfoControllerUnitTest {
                     assertNotNull(responseBody.getId());
                     assertEquals("Test Movie", responseBody.getName());
                     assertEquals("testId", responseBody.getId());
+                });
+    }
+
+    @Test
+    void when_POST_with_invalid_payload_then_bad_request() {
+        var movieInfoRequest = MovieInfo.builder()
+                .name("")
+                .year(-2023)
+                .cast(List.of(""))
+                .build();
+
+        webTestClient.post()
+                .uri(MOVIES_INFO_URL)
+                .bodyValue(movieInfoRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var responseBody = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(responseBody);
+                    assertEquals(List.of("cast must not be blank", "name must not be blank", "releaseDate cannot be null", "year must be a positive number"), responseBody.errors());
                 });
     }
 
