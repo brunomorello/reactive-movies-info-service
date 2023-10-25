@@ -4,6 +4,7 @@ import com.bmo.reactivemoviesinfoservice.domain.MovieInfo;
 import com.bmo.reactivemoviesinfoservice.service.MovieInfoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,8 +33,10 @@ public class MovieInfoController {
     }
 
     @GetMapping("/{id}")
-    public Mono<MovieInfo> getById(@PathVariable String id) {
-        return service.getMovieInfoById(id);
+    public Mono<ResponseEntity<MovieInfo>> getById(@PathVariable String id) {
+        return service.getMovieInfoById(id)
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @PostMapping
@@ -43,8 +46,10 @@ public class MovieInfoController {
     }
 
     @PutMapping("/{id}")
-    public Mono<MovieInfo> update(@PathVariable String id, @RequestBody MovieInfo movieInfo) {
-        return service.updateMovieInfo(id, movieInfo);
+    public Mono<ResponseEntity<MovieInfo>> update(@PathVariable String id, @RequestBody MovieInfo movieInfo) {
+        return service.updateMovieInfo(id, movieInfo)
+                .map(ResponseEntity.ok()::body)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @DeleteMapping("/{id}")

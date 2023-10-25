@@ -109,6 +109,16 @@ class MovieInfoControllerTest {
     }
 
     @Test
+    void when_GET_with_invalid_id_then_return_not_found() {
+        var movieInfoId = "12SW";
+        webTestClient.get()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void when_PUT_then_update_correspondent_movie_info() {
         var movieInfoId = "1SW";
         MovieInfo movieInfo = MovieInfo.builder()
@@ -135,6 +145,24 @@ class MovieInfoControllerTest {
     }
 
     @Test
+    void when_PUT_with_not_existent_id_then_return_not_found() {
+        var movieInfoId = "12SW";
+        MovieInfo movieInfo = MovieInfo.builder()
+                .name("Test")
+                .releaseDate(LocalDate.now())
+                .cast(List.of("Test Actor"))
+                .year(2023)
+                .build();
+
+        webTestClient.put()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void when_DELETE_then_delete_correspondent_movie_info() {
         var movieInfoId = "1SW";
 
@@ -143,5 +171,16 @@ class MovieInfoControllerTest {
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+    }
+
+    @Test
+    void when_DELETE_with_not_existent_id_then_return_not_found() {
+        var movieInfoId = "12SW";
+
+        webTestClient.delete()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 }
