@@ -17,7 +17,7 @@ public class MovieInfoService {
         this.repository = repository;
     }
 
-    public Mono<MovieInfo> createMovieInfo(MovieInfo movieInfo) {
+    public Mono<MovieInfo> createMovieInfo(final MovieInfo movieInfo) {
         return repository.save(movieInfo).log();
     }
 
@@ -25,16 +25,16 @@ public class MovieInfoService {
         return repository.findAll().log();
     }
 
-    public Mono<MovieInfo> getMovieInfoById(String id) {
+    public Mono<MovieInfo> getMovieInfoById(final String id) {
         return repository.findById(id).log();
     }
 
-    public Mono<MovieInfo> updateMovieInfo(String id, MovieInfo updatedMovieInfo) {
+    public Mono<MovieInfo> updateMovieInfo(final String id, final MovieInfo updatedMovieInfo) {
         return repository.findById(id)
                 .flatMap(updateMovieInfoMonoFunction(updatedMovieInfo));
     }
 
-    private Function<MovieInfo, Mono<MovieInfo>> updateMovieInfoMonoFunction(MovieInfo updatedMovieInfo) {
+    private Function<MovieInfo, Mono<MovieInfo>> updateMovieInfoMonoFunction(final MovieInfo updatedMovieInfo) {
         return movieInfoResp -> {
             movieInfoResp.setName(updatedMovieInfo.getName());
             movieInfoResp.setYear(updatedMovieInfo.getYear());
@@ -46,5 +46,9 @@ public class MovieInfoService {
 
     public Mono<Void> deleteMovieInfo(String id) {
         return repository.deleteById(id);
+    }
+
+    public Flux<MovieInfo> getMoviesByYear(final Integer year) {
+        return repository.findByYear(year);
     }
 }

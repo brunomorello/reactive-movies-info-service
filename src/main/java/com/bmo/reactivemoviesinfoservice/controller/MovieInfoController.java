@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -28,7 +29,10 @@ public class MovieInfoController {
     }
 
     @GetMapping
-    public Flux<MovieInfo> getAll() {
+    public Flux<MovieInfo> getAll(@RequestParam(value = "year", required = false) Integer year) {
+        if (year != null) {
+            return service.getMoviesByYear(year);
+        }
         return service.getAllMoviesInfo();
     }
 

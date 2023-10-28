@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -67,6 +68,25 @@ public class MovieInfoControllerUnitTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void when_GET_with_query_params_to_find_by_year_then_return_related_movies_info() {
+        var moviesListFlux = List.of(
+                MovieInfo.builder()
+                        .id("1SW")
+                        .name("Start Wars VI")
+                        .year(1983)
+                        .cast(List.of("Luke", "Obiwan"))
+                        .releaseDate(LocalDate.parse("1983-01-01"))
+                        .build()
+        );
+
+        when(service.getMoviesByYear(1983)).thenReturn(Flux.fromIterable(moviesListFlux));
+
+        var uri = UriComponentsBuilder.fromUriString(MOVIES_INFO_URL)
+                .queryParam("year", 1983)
+                .buildAndExpand().toUri();
     }
 
     @Test

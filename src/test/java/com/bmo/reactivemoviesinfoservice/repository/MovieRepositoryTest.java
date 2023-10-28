@@ -126,4 +126,13 @@ class MovieRepositoryTest {
                 .verifyComplete();
     }
 
+    @Test
+    void when_findByName_then_return_accordingly() {
+        Flux<MovieInfo> movieInfoFlux = movieRepository.findByName("Start Wars V");
+
+        StepVerifier.create(movieInfoFlux)
+                .assertNext(movieInfo -> assertEquals("Start Wars V", movieInfo.getName()))
+                .verifyComplete();
+    }
+
 }
