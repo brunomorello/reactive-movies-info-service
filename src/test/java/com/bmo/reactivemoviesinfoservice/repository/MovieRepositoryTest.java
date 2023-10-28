@@ -117,4 +117,13 @@ class MovieRepositoryTest {
                 .verifyComplete();
     }
 
+    @Test
+    void when_findByYear_then_return_accordingly() {
+        Flux<MovieInfo> movieInfoFlux = movieRepository.findByYear(1977).log();
+
+        StepVerifier.create(movieInfoFlux)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+
 }
