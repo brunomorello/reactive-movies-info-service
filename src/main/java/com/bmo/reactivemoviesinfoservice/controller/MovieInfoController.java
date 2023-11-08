@@ -4,6 +4,7 @@ import com.bmo.reactivemoviesinfoservice.domain.MovieInfo;
 import com.bmo.reactivemoviesinfoservice.service.MovieInfoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 @RestController
 @RequestMapping("/v1/moviesInfo")
@@ -24,8 +26,15 @@ public class MovieInfoController {
 
     private MovieInfoService service;
 
+    private Sinks.Many<MovieInfo> moviesInfoSink = Sinks.many().replay().all();
+
     public MovieInfoController(MovieInfoService service) {
         this.service = service;
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<MovieInfo> getMovieInfoStream() {
+        return moviesInfoSink.asFlux();
     }
 
     @GetMapping
@@ -46,7 +55,8 @@ public class MovieInfoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<MovieInfo> create(@RequestBody @Valid MovieInfo movieInfo) {
-        return service.createMovieInfo(movieInfo);
+        return service.createMovieInfo(movieInfo)
+                .doOnNext(moviesInfoSink::tryEmitNext);
     }
 
     @PutMapping("/{id}")
